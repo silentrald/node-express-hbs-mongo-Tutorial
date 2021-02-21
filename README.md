@@ -2,7 +2,7 @@
 
 Github Page: (Link)[https://github.com/silentrald/webdev-nodejs-tutorial]
 
-#### Requirements
+### Requirements
 
 **Software that are needed to be installed**
 
@@ -11,7 +11,7 @@ Github Page: (Link)[https://github.com/silentrald/webdev-nodejs-tutorial]
 
 - Basic knowledge of Ecmascript 6 (ES6), HTML and CSS
 
-#### Setup
+### Setup
 
 To start your project, select a directory where to place your application and create an empty folder(I'll use a webdev-project as my folder name, you can name this whatever you want). Open your terminal and locate the specific folder and enter the following command:
 
@@ -58,7 +58,7 @@ The command should log out *Listening to port: 5000* and you can access the site
 Congratulations! You have your first web application.
 
 ---
-#### Nodemon
+### Nodemon
 
 But we will encounter a problem when we want to change something on the `app.js` file so lets try editting it on this line:
 
@@ -97,7 +97,7 @@ webdev-project> npm run dev
 And once we try and change something on `app.js` like changing the 'Hi World' into 'Test', then it should automatically restart the server for us.
 
 ---
-#### Folder Structure
+### Folder Structure
 
 The folder structure is very important making application so that you have a very organized folder structure and you can locate the files you need to edit much easier. The folder structure I follow is as follows:
 
@@ -207,7 +207,7 @@ module.exports = router;
 And there you go, you created another path to your website, you can now access *localhost:5000/sample* and see a different message.
 
 ---
-#### Router Folder
+### Router Folder
 
 The current router folder we have has only 1 file, but you can have multiple router files but what's the different with all those router files, so let's try adding a new router file called test with the additional files to the test ctrl
 
@@ -255,6 +255,6 @@ app.listen(PORT, () => {
 The first thing that is different is that you see in the `app.js` file is the *app.get('/test', testRtr);* and it's just an indicator that when you see '/test' it is certain that the router handling that is the `router/test.js`. When you look at the routing as well '/test' isn't necessary to add in the test.js because '/test' was appended at the start when you added in the `app.js` file. When you go to *localhost:5000/test* then it should work and return the message. If we try adding another route in the `router/test.js` like a path to '/hello' it will be routed in the app to *localhost:5000/test/hello* which is a very helpful tool when routing is tied to user access and priveleges.
 
 ---
-#### Adding handlebars
+### Adding handlebars
 
 So we can send a string to our users but we want to give them an html file with design and logic. There are a lot of ways to server html files with express but in this tutorial we will use the handlebars templating engine which is simple enough to use. To start we need to  
