@@ -11,6 +11,6 @@ module.exports = {
         const client = await MongoClient.connect(process.env.MONGO_URI, {
             useUnifiedTopology: true
         });
-        return client.db('webdev-project');
+        return client.db(process.env.MONGO_DB);
     },
 };
