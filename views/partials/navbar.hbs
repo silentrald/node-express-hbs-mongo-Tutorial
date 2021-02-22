@@ -1,0 +1,11 @@
+<style>
+    .active {
+        background-color: green;
+    }
+</style>
+
+<nav>
+    <a href="/" {{#if ('===' tab 'index')}} class="active" {{/if}}>HOME</a>
+    <a href="/login" {{#if ('===' tab 'login')}} class="active" {{/if}}>LOGIN</a>
+    <a href="/register" {{#if ('===' tab 'register')}} class="active" {{/if}}>REGISTER</a>
+</nav>
