@@ -7,15 +7,13 @@
 - Handlbars/Hbs
 - NodeJS
 
-Github Page: [Link](https://github.com/silentrald/webdev-nodejs-tutorial)
-
 ### Requirements
 
 **Software that are needed to be installed**
 
 - Nodejs and Npm - [Latest](https://nodejs.org/en/download/current/)
 - MongoDB Community Server - [Latest](https://www.mongodb.com/try/download/community)
-- Basic knowledge of Ecmascript 6 (ES6), HTML and CSS
+- Basic knowledge of Ecmascript 6 (ES6), HTML and CSS - [Tutorial](https://github.com/KysonnDelaCerna/JavaScript-ES6-Tutorial)
 
 ### Setup
 

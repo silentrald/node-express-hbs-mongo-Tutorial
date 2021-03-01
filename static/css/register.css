@@ -1,0 +1,16 @@
+#register-container {
+  width: 30vw;
+  margin: 20vh 35vw;
+}
+
+#register-form {
+  width: max-content;
+}
+
+input {
+  width: max-content;
+}
+
+#register-btn {
+  float: right;
+}

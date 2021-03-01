@@ -2,6 +2,7 @@
 const express       = require('express');
 const bodyParser    = require('body-parser');
 const exphbs        = require('express-handlebars');
+const path          = require('path');
 const session       = require('express-session');
 
 require('dotenv').config();
@@ -38,6 +39,10 @@ if (process.env.NODE_ENV === 'development') {
 app.use(session(SESSION_OPT));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+if (process.env.NODE_ENV === 'development') {
+    app.use('/static', express.static(path.join(__dirname, 'static')));
+}
 
 // ROUTERS
 const indexRtr = require('./routers/index');

@@ -58,7 +58,6 @@ const indexCtrl = {
             delete user.password;
 
             req.session.user = user;
-            console.log(req.session);
 
             return res.redirect('/user');
 

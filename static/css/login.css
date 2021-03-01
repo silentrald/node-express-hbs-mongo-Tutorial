@@ -1,0 +1,16 @@
+#login-container {
+  width: 30vw;
+  margin: 20vh 35vw;
+}
+
+#login-form {
+  width: max-content;
+}
+
+input {
+  width: max-content;
+}
+
+#login-btn {
+  float: right;
+}
