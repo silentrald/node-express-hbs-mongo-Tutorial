@@ -274,4 +274,218 @@ When you go to _localhost:5000/test_ then it should work and return the message.
 
 ### Adding Handlebars
 
-So we can send a string to our users but we want to give them an html file with design and logic. There are a lot of ways to server html files with express but in this tutorial we will use the handlebars templating engine which is simple enough to use. To start we need to
+So we can send a string to our users but we want to give them an html file. There are a lot of ways to serve html files with express but in this tutorial we will use the handlebars templating engine which is simple enough to use. To start we need to add the module called **express-handlebars**.
+
+```
+webdev-project> npm install express-handlebars
+```
+
+and after the installation, we need to edit the `app.js` add them to these section of the code
+
+app.js
+
+```javascript
+// REQUIRE
+const exphbs = require('express-handlebars');
+
+...
+
+// INITIALIZE THE TEMPLATING ENGINE
+app.engine('hbs', exphbs({
+  extname: '.hbs'
+}));
+app.set('view engine', 'hbs');
+...
+```
+
+This sets the **request** object to have a render method. We can now add `.hbs` files so that the server can render it. But first, we need to make a `views/layout/main.hbs` where this is the default layout used by handlebars which just contains the header and a template body.
+
+views/layout/main.hbs
+
+```handlebars
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title }}</title>
+</head>
+
+<body>
+  {{{ body }}}
+</body>
+
+</html>
+```
+
+This is your standard html format with the additional double/triple curly braces({{}}). The **{{ title }}** here is passed from the server which is in an object format(This will be shown later), and the **{{{ body }}}** will contain a template of your body, depending on what you want to render. To understand that, let's make an `views/index.hbs` file and try changing the **getIndex** function inside `ctrl/index.js`.
+
+views/index.hbs
+
+```handlebars
+<h1>This is our homepage</h1>
+```
+
+ctrl/index.js
+
+```javascript
+getIndex: (_req, res) => {
+  return res.render('index', {
+    title: 'Index Page'
+});
+},
+```
+
+Let's look at the **res.render** function, which we can pass two params:
+
+- **1st PARAM** is a **string** which is what we want as a template to in our **views** folder. To link that in our file structure, you can see that we have a `views/index.hbs`, this is what the res.render will get (note that the .hbs extension is not needed anymore). To further understand the implementation, let's say we have a `views/login.hbs` and to render that file, we just have to say **res.render('login')**.
+
+This is what replaces the **{{{ body }}}** in the `views/layout/main.hbs` file. So that **{{{ body }}}** will be replaced with the contents of `views/index.hbs` so the body will look like this when passed to the client.
+
+```html
+<body>
+  <!-- {{{ body }}} -->
+  <h1>This is our homepage</h1>
+</body>
+```
+
+**NOTE:** Triple brace also signifies that it needs to render the string as an html template, when you accidentally use a double brace, it will show in your browser as the literal string instead of the string is enclosed by _h1 tags_
+
+---
+
+When you use triple brace {{{}}}
+
+<h1>This is our homepage</h1>
+
+When you use double brace {{}}
+
+```
+<h1>This is our homepage</h1>
+```
+
+---
+
+- **2nd PARAM** is an **object** which is the data that we want to pass to the template/html. So you can see we have a **title** in the object, this will be passed in the `views/layout/main.hbs` in the **{{ title }}** part, so whatever string is inside the **title** data it will just replace it in the html part.
+
+So in the program, we passed a title data with the string Index Page, so when we render the page, the title tags will contain the string
+
+```html
+<title>Index Page</title>
+```
+
+We can also do this with the template itself so lets try doing it in the `views/index.hbs` and add some more embedding text.
+
+views/index.hbs
+
+```handlebars
+<!-- Append to the end of the file -->
+<h1>{{ header }}</h1>
+
+{{ msg }}
+```
+
+and in the res.render should contain those keys
+
+ctrl/index.js
+
+```javascript
+getIndex: (_req, res) => {
+  return res.render('index', {
+    title: 'Index Page',
+    msg: 'Hi there guys',
+    header: 'header'
+  });
+},
+```
+
+So it will the header and msg will replace the string.
+
+**NOTE:** When you do not pass any data to render, hbs will just treat it as an empty string.
+
+---
+
+### Static Files (CSS and HTML)
+
+Since we only put the skeleton(html) code to the user, we need to add some css(design) and javascript(functionality) so it would have a better user experience. We can try putting a **style** and **script** tag to our `index.hbs` file but it is not recommended since when we do that, the page will be rendered twice, (Once for the page load and one more when the styles are added), so styles should be always be linked inside **header** tag. We can solve this by passing it in the data section in our **res.render** method. So we need to edit the `views/layouts/main.hbs` and the **res.render** function
+
+views/layouts/main.hbs
+
+```handlebars
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+
+    <!-- Default css -->
+    <link rel="stylesheet" href="/static/css/main.css"> <!-- copy the main.css file -->
+    <!-- Dynamic css -->
+    {{#each styles}}
+    <link rel="stylesheet" href="/static/css/{{ this }}.css">
+    {{/each}}
+</head>
+
+<body>
+    {{>navbar}}
+
+    {{{ body }}}
+
+    <!-- Dynamic JS -->
+    {{#each scripts}}
+    <link rel="stylesheet" href="/static/js/{{ this }}.js">
+    {{/each}}
+</body>
+
+</html>
+```
+
+ctrl/index.js
+
+```javascript
+getIndex: (_req, res) => {
+  return res.render('index', {
+    title: 'Index Page',
+    msg: 'Hi there guys',
+    header: 'header',
+    styles: [ 'register' ], // Copy static/css/register.css
+    scripts: [ 'hello' ], // Copy static/js/hello.js
+  });
+},
+```
+
+This will add the links to the css and js but this will not work yet since we aren't serving the static files yet, so in the `app.js` we need to add this code.
+
+app.js
+
+```javascript
+...
+// MIDDLEWARES
+app.use('/static', express.static(path.join(__dirname, 'static')));
+...
+```
+
+This will route all of our css and js in the path. So example we have our main.css in the static/css folder. To access that in the site we just have to type the path **_http://localhost:5000/static/css/main.css_** which will print the contents of the css file. So once this is done you can reload the page see the design and scripts loaded for the page.
+
+---
+
+### Adding Partials
+
+---
+
+### dotenv
+
+---
+
+### Authentication (Login and Registration)
+
+**Using express-session**
+
+---
+
+### bcrypt
+
+---
+
+### MongoDB

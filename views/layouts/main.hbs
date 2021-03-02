@@ -8,14 +8,19 @@
     <title>{{ title }}</title>
 
     <link rel="stylesheet" href="/static/css/main.css">
-    <link rel="stylesheet" href="/static/css/login.css">
-    <link rel="stylesheet" href="/static/css/register.css">
+    {{#each styles}}
+    <link rel="stylesheet" href="/static/css/{{ this }}.css">
+    {{/each}}
 </head>
 
 <body>
     {{>navbar}}
 
     {{{ body }}}
+
+    {{#each scripts}}
+    <link rel="stylesheet" href="/static/js/{{ this }}.js">
+    {{/each}}
 </body>
 
 </html>
