@@ -472,9 +472,108 @@ This will route all of our css and js in the path. So example we have our main.c
 
 ### Adding Partials
 
+Partials are a way to modularize parts of code that we will be using multiple times across different pages. We can use partials to create a navbar so that once we make changes to the `views/partials/navbar.hbs` file, the changes would be reflected across all pages. Similar to how we used **{{{ body }}}** to render another .hbs file within `views/layout/main.hbs`, we can render the navbar partial using **{{> navbar}}**.
+
+```handlebars
+<body>
+    {{>navbar}}
+
+    {{{ body }}}
+</body>
+```
+
+When we look at our navbar at `views/partials/navbar.hbs`, this is what we see. We can see that it just consists of a style and some links. We don't want every single link to be styled as active which is why we sandwich the `class="active"` in between the handlebars if clause `{{#if }} {{/if}}`. But what does the condition in the if statement mean?
+
+```handlebars
+<style>
+    .active {
+        background-color: green;
+    }
+</style>
+
+<nav>
+    <a href="/" {{#if ('===' tab 'index')}} class="active" {{/if}}>HOME</a>
+    <a href="/login" {{#if ('===' tab 'login')}} class="active" {{/if}}>LOGIN</a>
+    <a href="/register" {{#if ('===' tab 'register')}} class="active" {{/if}}>REGISTER</a>
+</nav>
+```
+
+If we take a look at how we initialize the templating engine within our `app.js`, we can see a field called **helpers**. This allows us to create functions that we can call within our .hbs files. Here we can see that **'==='** is just checking for equality between **arg1** and **arg2**. But where did tab even come from?
+
+```javascript
+app.engine('hbs', exphbs({
+    extname: '.hbs',
+    helpers: {
+        '===': (arg1, arg2) => arg1 === arg2,
+    }
+}));
+```
+
+If you recall, the **2nd PARAM** of **res.render** is an object that we can use to pass data to our template. If we take a look at `getIndex` of `ctrl/index.js`, we can see that we are passing the value of **'index'** as tab. This makes it so when we render the index, the **HOME** option will be the active link in our navbar. 
+
+```javascript
+getIndex: (_req, res) => {
+  return res.render('index', {
+    title: 'Index Page',
+    msg: 'Hi there guys',
+    header: 'header',
+    tab: 'index'
+  });
+},
+```
+
 ---
 
 ### dotenv
+
+Dotenv is a module that allows us to declare variables containing sensitive information within an environment file (i.e. a .env file). For this project, we're using it to store our session's secret key. However, if you take a look around this project's file, you won't find a .env file. This is because we don't openly distribute them because of how sensitive they are. What is provided is the `.env.example` file. This contains all the variables that our program needs. We can copy this file and fill the in the values.
+
+```
+NODE_ENV=development
+
+SESSION_SECRET=suchsecretmuchkey
+
+MONGO_URI=mongodb://localhost:27017
+MONGO_DB=webdev-project
+```
+
+**NOTE:** Windows won't allow you to rename the file to `.env` so you have to open up a command prompt and rename it there.
+
+```
+webdev-project> ren ".env - Copy.example" .env
+```
+
+Now that we have that setup we can then use the environment variables that we declared in our `app.js` by accessing them in `process.env`.
+
+```javascript
+require('dotenv').config();
+
+const SESSION_OPT = {
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: process.env.NODE_ENV === 'development'
+  }
+};
+
+app.use(session(SESSION_OPT));
+```
+
+**Using .gitignore**
+
+So that we don't accidentally upload senstive files like our `.env` file or other unneccesary things, we can create a `.gitignore` file so that they will no longer be included.
+
+```
+*.DS_Store
+.env
+node_modules
+
+feedback.txt
+```
+
+In this file, we declared that the .env and feedback.txt file, all files ending with .DS_Store, and the entire node_modules folder should not be uploaded into our git repository. This keeps our repository clutter free.
 
 ---
 
@@ -482,10 +581,152 @@ This will route all of our css and js in the path. So example we have our main.c
 
 **Using express-session**
 
+When we access websites like Facebook or YouTube, we can bypass the login page if we already logged in before. We can also implement this in our web application using express sessions. We can store important information about the sessions with the use of cookies that are encrypted using the session's secret key. We can tell express to use sessions using this snippet of code in our `app.js`.
+
+```javascript
+const session = require('express-session');
+
+require('dotenv').config();
+
+const SESSION_OPT = {
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: process.env.NODE_ENV === 'development'
+  }
+};
+
+app.use(session(SESSION_OPT));
+```
+
+Now that we have configured sessions, we can now store informationg inside sessions. This is how logging in works inside `ctrl/index.js`. Whenever a use tries to log in, we retrieve that user from the database. If such user exists and their password matches, we then store that user in our session so that our web application can remember who they are. Although both the session and the user's password are encrypted, it is still a good practice to not include the user's password inside the session. This is done by deleting the password from the user object using `delete user.password`.
+
+```javascript
+postLogin: async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const db = await client();
+
+    const user = await db.collection('users').findOne({ username });
+
+    if (!user) {
+      return res.status(403).render('login', {
+        title: 'Login Page',
+        tab: 'login',
+        error: 'Auth Failed'
+      });
+    }
+
+    const valid = await bcrypt.compare(password, user.password);
+
+    if (!valid) {
+      return res.status(403).render('login', {
+        title: 'Login Page',
+        tab: 'login',
+        error: 'Auth Failed'
+      });
+    }
+
+    delete user.password;
+
+    req.session.user = user;
+
+    return res.redirect('/user');
+
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).render('login', {
+      title: 'Login Page',
+      tab: 'login',
+      error: 'Something went wrong on our side'
+    });
+  }
+},
+```
+
+This makes it so that we can login and the web application will remember who we are. However, when we visit the login page, it doesn't automatically redirect us the user page. Even worse, we can access the user pages without actually being logged in if we manually type in the URL. To fix this, we need to create a middleware that will check if a user is authenticated or not and redirect them accordingly. In `mw/auth.js` we export two seperate functions to deal with the two problems. `isAuth` will allow the user to access portions of the site only if they're authenticated. On the other hand, `isNotAuth` will automatically redirect an authenticated user to the user page when they try to login.
+
+```javascript
+const authMw = {
+  isAuth: (req, res, next) => {
+    if (!req.session.user) {
+      return res.redirect('/login');
+    }
+
+    next();
+  },
+
+  isNotAuth: (req, res, next) => {
+    if (req.session.user) {
+      return res.redirect('/user');
+    }
+
+    next();
+  }
+};
+```
+
+We may have created a way to check if the user is authenticated, but we still haven't told our web application to actually check. We can do this by inserting the middleware in our router. In `routers/index.js`, we can see the `isNotAuth` function being used before we can access the login page. This makes it so that an authenticated user would instantly skip the login page.
+
+```javascript
+router.get('/login',
+  authMw.isNotAuth,
+  ctrl.getLogin,
+);
+```
+
+We can see `isAuth` being used inside `routers/user.js`. This makes sure that a user is logged in before they can access the user page.
+
+```javascript
+router.get('/',
+  authMw.isAuth,
+  ctrl.getUser
+);
+```
+
 ---
 
 ### bcrypt
 
+When storing user passwords or password hints inside a database, we should **NEVER** store them as plaintext. This makes data breaches very dangerous because all user accounts will be instantly compromised. We can use bcrypt to hash user passwords before storing them inside our database. Additionally, we can include the use of salt to make our hashes even more unpredictable. We can see this in action inside `postRegister` of `ctrl/index.js`.
+
+```javascript
+const salt = await bcrypt.genSalt(8);
+const hash = await bcrypt.hash(password, salt);
+
+await db.collection('users').insertOne({
+  username,
+  password: hash
+});
+```
+
+When logging in, we can check if a user's password matches the one in the database using `bcrpty.compare()`. This function takes two parameters. The first parameter is the password we're testing. The second parameter is the password we're testing against. We can see this being used in `postLogin` of `ctrl/index.js`.
+
+```javascript
+const valid = await bcrypt.compare(password, user.password);
+```
+
 ---
 
 ### MongoDB
+
+MongoDB stores data in the form of documents inside collections. In the case of our web application, we only need to store user data. We store all user data inside a collection appropriately called `users`. Each document within this collection pertains to one user. We can see `postRegister` of `ctrl/index.js` interact with the user collection. This creates a new user inside our database with the corresponding fields.
+
+```javascript
+await db.collection('users').insertOne({
+  username,
+  password: hash
+});
+```
+
+We can see `postLogin` of `ctrl/index.js` access our database too. In this line, we can see that we are looking for only one specific user. Because username are supposed to be unique, we should only get one document with that username. The parameter that we are passing is an object with the fields that have those specific values. This is called a *query*. In this case, we're looking for the user with that specific username.
+
+```javascript
+const user = await db.collection('users').findOne({ username });
+```
+
+You can check the documentation for these MongoDB functions and many more [here](https://docs.mongodb.com/manual/reference/method/js-collection/). If you want to further sort the documents that were found or perform other operations on it, you can check the documentation on those [here](https://docs.mongodb.com/manual/reference/method/js-cursor/).
