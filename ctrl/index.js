@@ -1,6 +1,8 @@
 const { client } = require('../db');
 const bcrypt     = require('bcrypt');
 
+// const User       = require('../models/User');
+
 const indexCtrl = {
     getIndex: (_req, res) => {
         return res.render('index', {
@@ -35,7 +37,11 @@ const indexCtrl = {
         try {
             const db = await client();
 
+            // MONGOOSE FIND ONE
             const user = await db.collection('users').findOne({ username });
+
+            // MONGOOSE FIND ONE
+            // const user = await User.findOne({ username });
 
             if (!user) {
                 return res.status(403).render('login', {
@@ -81,10 +87,17 @@ const indexCtrl = {
             const salt = await bcrypt.genSalt(8);
             const hash = await bcrypt.hash(password, salt);
 
+            // MONGODB INSERT ONE
             await db.collection('users').insertOne({
                 username,
                 password: hash
             });
+
+            // MONGOOSE INSERT ONE
+            // await User.create({
+            //     username,
+            //     password: hash
+            // });
 
             return res.redirect('/login');
         } catch (err) {

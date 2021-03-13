@@ -577,6 +577,106 @@ In this file, we declared that the .env and feedback.txt file, all files ending 
 
 ---
 
+### Accessing the database
+
+MongoDB stores data in the form of documents inside collections. In the case of our web application, we only need to store user data. We store all user data inside a collection appropriately called `users`. Each document within this collection pertains to one user. In this tutorial, we will show you two ways to access the MongoDB database. It's up to you to choose which one you prefer.
+
+**Using MongoDB**
+
+ The MongoDB package allows us to interact with our MongoDB database. We can use the connect function inside of `db/index.js` to connect to our MongoDB database.
+ 
+```javascript
+client: async () => {
+  const client = await MongoClient.connect(process.env.MONGO_URI, {
+    useUnifiedTopology: true
+  });
+  return client.db(process.env.MONGO_DB);
+},
+```
+
+ Before we can do anything with our databse, we first have to connect to it. Once done you are free to perform any operations on the database. After we've connected, we can use `postRegister` of `ctrl/index.js` to interact with the users collection. This creates a new user inside our database with the corresponding fields.
+
+```javascript
+const db = await client();
+
+await db.collection('users').insertOne({
+  username,
+  password: hash
+});
+```
+
+We can see `postLogin` of `ctrl/index.js` access our database too. In this line, we can see that we are looking for only one specific user. Because username are supposed to be unique, we should only get one document with that username. The parameter that we are passing is an object with the fields that have those specific values. This is called a *query*. In this case, we're looking for the user with that specific username.
+
+```javascript
+const db = await client();
+
+const user = await db.collection('users').findOne({ username });
+```
+
+You can check the documentation for these MongoDB functions and many more [here](https://docs.mongodb.com/manual/reference/method/js-collection/). If you want to further sort the documents that were found or perform other operations on it, you can check the documentation on those [here](https://docs.mongodb.com/manual/reference/method/js-cursor/).
+
+
+**Using Mongoose**
+
+Mongoose is another package that we can use to interact with out MongoDB database. It's different from the MongoDB package because we first have to define a **schema** for our collections. A schema is basically a way to describe how a document should look like. Over at `models/User.js`, we can see the schema for our user object. We can define the data type for each field and put specific constraints for them. For more information about data validation, you can check the documentation [here](https://mongoosejs.com/docs/validation.html).
+
+```javascript
+const mongoose = require('mongoose');
+
+const Schema = mongoose.Schema;
+
+const User = new Schema({
+  username: {
+    type: String,
+    maxlength: 30,
+    required: true,
+    uniqure: true
+  },
+  password: {
+    type: String,
+    minlength: 60,
+    maxlength: 60,
+    required: true
+  }
+});
+
+module.exports = mongoose.model('User', User);
+```
+
+Similar to the MongoDB package, we have to connect to the database first before we can do anything. However, we only need to connect inside our `app.js`. Mongoose will handle the rest for us.
+
+```javascript
+const mongoose      = require('mongoose');
+
+// CONNECT TO DATABASE WITH MONGOOSE
+mongoose.connect(`${process.env.MONGO_URI}/${process.env.MONGO_DB}`, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true
+});
+```
+
+Now that we've done that, the rest is simple. We just have to import our User schema and do all our operations from there. In `ctrl/index.js`, we can see the Mongoose counterparts of the basic operations. Finding a single document is more or less the same with MongoDB.
+
+```javascript
+const User       = require('../models/User');
+
+const user = await User.findOne({ username });
+```
+
+Inserting a document is different. It's called *create* instead of *insertOne*.
+
+```javascript
+await User.create({
+  username,
+  password: hash
+});
+```
+
+For more information about the Mongoose model API you can go [here](https://mongoosejs.com/docs/api/model.html).
+
+---
+
 ### Authentication (Login and Registration)
 
 **Using express-session**
@@ -709,24 +809,3 @@ When logging in, we can check if a user's password matches the one in the databa
 ```javascript
 const valid = await bcrypt.compare(password, user.password);
 ```
-
----
-
-### MongoDB
-
-MongoDB stores data in the form of documents inside collections. In the case of our web application, we only need to store user data. We store all user data inside a collection appropriately called `users`. Each document within this collection pertains to one user. We can see `postRegister` of `ctrl/index.js` interact with the user collection. This creates a new user inside our database with the corresponding fields.
-
-```javascript
-await db.collection('users').insertOne({
-  username,
-  password: hash
-});
-```
-
-We can see `postLogin` of `ctrl/index.js` access our database too. In this line, we can see that we are looking for only one specific user. Because username are supposed to be unique, we should only get one document with that username. The parameter that we are passing is an object with the fields that have those specific values. This is called a *query*. In this case, we're looking for the user with that specific username.
-
-```javascript
-const user = await db.collection('users').findOne({ username });
-```
-
-You can check the documentation for these MongoDB functions and many more [here](https://docs.mongodb.com/manual/reference/method/js-collection/). If you want to further sort the documents that were found or perform other operations on it, you can check the documentation on those [here](https://docs.mongodb.com/manual/reference/method/js-cursor/).

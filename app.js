@@ -4,6 +4,7 @@ const bodyParser    = require('body-parser');
 const exphbs        = require('express-handlebars');
 const path          = require('path');
 const session       = require('express-session');
+// const mongoose      = require('mongoose');
 
 require('dotenv').config();
 
@@ -43,6 +44,13 @@ app.use(bodyParser.json());
 if (process.env.NODE_ENV === 'development') {
     app.use('/static', express.static(path.join(__dirname, 'static')));
 }
+
+// CONNECT TO DATABASE WITH MONGOOSE
+// mongoose.connect(`${process.env.MONGO_URI}/${process.env.MONGO_DB}`, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+//     useCreateIndex: true
+// });
 
 // ROUTERS
 const indexRtr = require('./routers/index');
