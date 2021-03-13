@@ -15,6 +15,21 @@
 - MongoDB Community Server - [Latest](https://www.mongodb.com/try/download/community)
 - Basic knowledge of Ecmascript 6 (ES6), HTML and CSS - [Tutorial](https://github.com/KysonnDelaCerna/JavaScript-ES6-Tutorial)
 
+### Table of Contents
+1. [Setup](#setup)
+2. [Nodemon](#nodemon)
+3. [Folder Structure](#folder-structure)
+4. [Router Folder](#router-folder)
+5. [Adding Handlebars](#adding-handlebars)
+6. [Static Files (CSS and HTML)](#static-files-css-and-html)
+7. [Adding Partials](#adding-partials)
+8. [dotenv](#dotenv)
+9. [Accessing the Database](#accessing-the-database)
+10. [Authentication (Login and Registration)](#authentication-login-and-registration)
+11. [bcrypt](#bcrypt)
+
+---
+
 ### Setup
 
 To start your project, select a directory that will house your application and create an empty folder (I'll use a webdev-project as my folder name; you can name this whatever you want). Open your terminal and locate the specific folder and enter the following command:
@@ -652,8 +667,11 @@ const mongoose      = require('mongoose');
 mongoose.connect(`${process.env.MONGO_URI}/${process.env.MONGO_DB}`, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  useFindAndModify: false,
   useCreateIndex: true
-});
+})
+  .then(() => console.log('MONGO CONNECTED'))
+  .catch((err) => console.log(err));
 ```
 
 Now that we've done that, the rest is simple. We just have to import our User schema and do all our operations from there. In `ctrl/index.js`, we can see the Mongoose counterparts of the basic operations. Finding a single document is more or less the same with MongoDB.

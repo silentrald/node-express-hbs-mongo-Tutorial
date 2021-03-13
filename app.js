@@ -49,8 +49,11 @@ if (process.env.NODE_ENV === 'development') {
 // mongoose.connect(`${process.env.MONGO_URI}/${process.env.MONGO_DB}`, {
 //     useNewUrlParser: true,
 //     useUnifiedTopology: true,
+//     useFindAndModify: false,
 //     useCreateIndex: true
-// });
+// })
+//     .then(() => console.log('MONGO CONNECTED'))
+//     .catch((err) => console.log(err));
 
 // ROUTERS
 const indexRtr = require('./routers/index');
