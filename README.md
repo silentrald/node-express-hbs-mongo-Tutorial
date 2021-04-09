@@ -70,9 +70,7 @@ Once you create this file, you can now deploy your web application this with the
 webdev-project> node app
 ```
 
-The command should log out _Listening to port: 5000_. You can now access the site using your browser by typing _localhost:5000_ on the URL bar, which should show this:
-
-![1.png](_assets/1.png)
+The command should log out _Listening to port: 5000_. You can now access the site using your browser by typing _localhost:5000_ on the URL bar, which should render the string `Hello World`.
 
 Congratulations! You have your first web application.
 
@@ -80,7 +78,7 @@ Congratulations! You have your first web application.
 
 ### Nodemon
 
-But we will encounter a problem when we want to change something on the `app.js` file but wouldn't immediately reflect to the server. Let's try editing this line:
+We will encounter a problem when we want to change something on the `app.js` file, but wouldn't immediately reflect to the server. Let's try editing this line:
 
 ```javascript
 app.get("/", (_req, res) => {
@@ -92,13 +90,13 @@ app.get("/", (_req, res) => {
 });
 ```
 
-Once you save the file then access the site, it will still give you the message "Hello World". To solve this, we need to restart the server by pressing **Ctrl + C** and rerunning the command of _node app_. There is no problem with doing this, but it becomes tedious when you have to edit and restart the server manually. To make our lives easier, there is a module that watches the files for us so once we edit and save, the server automatically restarts. That module is called **nodemon**. You can install the module by using the npm command:
+Once you save the file then access the site, it will still give you the message "Hello World". To solve this, we need to restart the server by pressing **Ctrl + C** and re-running the command of _node app_. There is no problem with doing this, but it becomes tedious when you have to edit and restart the server manually. To make our lives easier, there is a module that watches the files for us so once we edit and save, the server automatically restarts. That module is called **nodemon**. You can install the module by using the npm command:
 
 ```
 webdev-project> npm i --save-dev nodemon
 ```
 
-This module will be installed to our application, but as you can see there is difference when we installed the _express_ module with the additional tag **--save-dev** which just means that the module is just installed when you are in a development mode. This mode is only for the developers so that it would be easier to code the application, and at the same time, it is not needed when we deploy it to production (or to the public). Then we can edit the `package.json` file and edit the **scripts** key to have these values:
+This module will be installed to our application, but as you can see there is difference when we installed the _express_ module, with the additional tag **--save-dev** which just means that the module is only installed when you are in a development mode. This mode is only for the developers so that it would be easier to code the application, and at the same time, it is not present when we deploy it to production (or to the public). Then we can edit the `package.json` file and edit the **scripts** key to have these values:
 
 ```json
 ...
@@ -108,7 +106,7 @@ This module will be installed to our application, but as you can see there is di
 ...
 ```
 
-So you can run the nodemon command through the `package.json` file by using the command:
+You can run the nodemon command through the `package.json` file by using the command:
 
 ```
 webdev-project> npm run dev
@@ -194,8 +192,7 @@ app.listen(PORT, () => {
   console.log(`Listening to port: ${PORT}`);
 });
 ```
-
-So when we try to access _localhost:5000/_, it will give us a `Hello World` string. We haven't changed any logic or added another route yet, so let's try adding another URL path like _/sample_. To do that, we have to add to the _route_ and _ctrl_ files. The files should look like this:
+When we try to access _localhost:5000/_, it will give us a `Hello World` string. We haven't changed any logic or added another route yet, so let's try adding another URL path like _/sample_. To do that, we have to add to the _route_ and _ctrl_ files. The files should look like this:
 
 /ctrl/index.js
 
@@ -234,7 +231,7 @@ And there you go, we have created another path to our website. You can now acces
 
 ### Router Folder
 
-Our current router folder has only one file; but we can have multiple router files to point to different URL paths in our web application. Llet's try adding a new router file called `test` along with the additional files to the ctrl folder. Take note that you can name these files differently; I name the files similarly so that it is easy to trace later on.
+Our current router folder has only one file; but we can have multiple router files to point to different URL paths in our web application. Let's try adding a new router file called `test.js` along with the additional files to the ctrl folder. Take note that **you can name these files differently**; I only named the files similarly so that it is easy to trace later on.
 
 /ctrl/test.js
 
@@ -289,7 +286,7 @@ When you go to _localhost:5000/test_ then it should work and return the message.
 
 ### Adding Handlebars
 
-So we can send a string to our users but we want to give them an html file. There are a lot of ways to serve html files with express but in this tutorial we will use the handlebars templating engine which is simple enough to use. To start we need to add the module called **express-handlebars**.
+We can send a string to our users, but we'd need to give them an html file. There are a lot of ways to serve html files with express, but in this tutorial we will use the handlebars templating engine which is simple enough to use. To start we need to add the module called **express-handlebars**.
 
 ```
 webdev-project> npm install express-handlebars
@@ -335,7 +332,7 @@ views/layout/main.hbs
 </html>
 ```
 
-This is your standard html format with the additional double/triple curly braces({{}}). The **{{ title }}** here is passed from the server which is in an object format(This will be shown later), and the **{{{ body }}}** will contain a template of your body, depending on what you want to render. To understand that, let's make an `views/index.hbs` file and try changing the **getIndex** function inside `ctrl/index.js`.
+This is your standard html format with the additional double/triple curly braces(**{{  }}**). The **{{ title }}** here is passed from the server which is in an object format(This will be shown later), and the **{{{ body }}}** will contain a template of your body, depending on what you want to render. To understand that, let's make an `views/index.hbs` file and try changing the **getIndex** function inside `ctrl/index.js`.
 
 views/index.hbs
 
@@ -357,7 +354,7 @@ Let's look at the **res.render** function, which we can pass two params:
 
 - **1st PARAM** is a **string** which is what we want as a template to in our **views** folder. To link that in our file structure, you can see that we have a `views/index.hbs`, this is what the res.render will get (note that the .hbs extension is not needed anymore). To further understand the implementation, let's say we have a `views/login.hbs` and to render that file, we just have to say **res.render('login')**.
 
-This is what replaces the **{{{ body }}}** in the `views/layout/main.hbs` file. So that **{{{ body }}}** will be replaced with the contents of `views/index.hbs` so the body will look like this when passed to the client.
+This is what replaces the **{{{ body }}}** in the `views/layout/main.hbs` file. The entire tag **{{{ body }}}** will be replaced with the contents of `views/index.hbs`, so the html's body will look like this when passed to the client.
 
 ```html
 <body>
@@ -374,6 +371,8 @@ When you use triple brace {{{}}}
 
 <h1>This is our homepage</h1>
 
+
+
 When you use double brace {{}}
 
 ```
@@ -384,13 +383,13 @@ When you use double brace {{}}
 
 - **2nd PARAM** is an **object** which is the data that we want to pass to the template/html. So you can see we have a **title** in the object, this will be passed in the `views/layout/main.hbs` in the **{{ title }}** part, so whatever string is inside the **title** data it will just replace it in the html part.
 
-So in the program, we passed a title data with the string Index Page, so when we render the page, the title tags will contain the string
+In the program, we passed a title data with the string Index Page, so when we render the page, the title tags will contain the string
 
 ```html
 <title>Index Page</title>
 ```
 
-We can also do this with the template itself so lets try doing it in the `views/index.hbs` and add some more embedding text.
+We can also do this with the template itself, so lets try doing it in the `views/index.hbs` and add some more embedding text.
 
 views/index.hbs
 
@@ -423,7 +422,7 @@ So it will the header and msg will replace the string.
 
 ### Static Files (CSS and HTML)
 
-Since we only put the skeleton(html) code to the user, we need to add some css(design) and javascript(functionality) so it would have a better user experience. We can try putting a **style** and **script** tag to our `index.hbs` file but it is not recommended since when we do that, the page will be rendered twice, (Once for the page load and one more when the styles are added), so styles should be always be linked inside **header** tag. We can solve this by passing it in the data section in our **res.render** method. So we need to edit the `views/layouts/main.hbs` and the **res.render** function
+Since we only put the skeleton(html) code to the user, we need to add some css(design) and javascript(functionality) so users would have a better user experience. We can try putting a **style** and **script** tag to our `index.hbs` file, but it is not recommended since when we do that as the page will be rendered twice, (Once for the page load and one more when the styles are added). As such, styles should be always be linked inside **header** tag. We can solve this by passing it in the data section in our **res.render** method. So we need to edit the `views/layouts/main.hbs` and the **res.render** function
 
 views/layouts/main.hbs
 
@@ -470,7 +469,7 @@ getIndex: (_req, res) => {
 },
 ```
 
-This will add the links to the css and js but this will not work yet since we aren't serving the static files yet, so in the `app.js` we need to add this code.
+This will add the links to the css and js, however, this will not work yet since we aren't serving the static files yet. To do so, we need to add the following code in the `app.js` file:
 
 app.js
 
@@ -497,7 +496,7 @@ Partials are a way to modularize parts of code that we will be using multiple ti
 </body>
 ```
 
-When we look at our navbar at `views/partials/navbar.hbs`, this is what we see. We can see that it just consists of a style and some links. We don't want every single link to be styled as active which is why we sandwich the `class="active"` in between the handlebars if clause `{{#if }} {{/if}}`. But what does the condition in the if statement mean?
+When we look at our navbar at `views/partials/navbar.hbs`, this is what we see. We can see that it just consists of a style and some links. We don't want every single link to be styled as active which is why we sandwich the `class="active"` in between the handlebars if clause `{{#if }} {{/if}}`. But what does the condition in the `if` statement mean?
 
 ```handlebars
 <style>
@@ -578,7 +577,7 @@ app.use(session(SESSION_OPT));
 
 **Using .gitignore**
 
-So that we don't accidentally upload senstive files like our `.env` file or other unneccesary things, we can create a `.gitignore` file so that they will no longer be included.
+So that we don't accidentally upload sensitive files like our `.env` file or other unneccesary things, we can create a `.gitignore` file so that they will no longer be included whenever we do our usual git add-commit-push.
 
 ```
 *.DS_Store
@@ -588,7 +587,7 @@ node_modules
 feedback.txt
 ```
 
-In this file, we declared that the .env and feedback.txt file, all files ending with .DS_Store, and the entire node_modules folder should not be uploaded into our git repository. This keeps our repository clutter free.
+In this file, we declared that the _.env_ and _feedback.txt_ file, all files ending with _.DS_Store_, and the entire _node_modules_ folder should not be uploaded into our git repository. This keeps our repository clutter free.
 
 ---
 
@@ -719,7 +718,7 @@ const SESSION_OPT = {
 app.use(session(SESSION_OPT));
 ```
 
-Now that we have configured sessions, we can now store informationg inside sessions. This is how logging in works inside `ctrl/index.js`. Whenever a use tries to log in, we retrieve that user from the database. If such user exists and their password matches, we then store that user in our session so that our web application can remember who they are. Although both the session and the user's password are encrypted, it is still a good practice to not include the user's password inside the session. This is done by deleting the password from the user object using `delete user.password`.
+Now that we have configured sessions, we can now store additional information inside sessions. This is how login works inside `ctrl/index.js`. Whenever a user tries to log in, we check if username exists in the database. If such user exists and their password matches, we store that user in our session so our web application can remember the user's identity. Although both the session and the user's password are encrypted, it is still a good practice to not include the user's password inside the session. This is done by deleting the password from the user object using `delete user.password`.
 
 ```javascript
 postLogin: async (req, res) => {
@@ -766,7 +765,7 @@ postLogin: async (req, res) => {
 },
 ```
 
-This makes it so that we can login and the web application will remember who we are. However, when we visit the login page, it doesn't automatically redirect us the user page. Even worse, we can access the user pages without actually being logged in if we manually type in the URL. To fix this, we need to create a middleware that will check if a user is authenticated or not and redirect them accordingly. In `mw/auth.js` we export two seperate functions to deal with the two problems. `isAuth` will allow the user to access portions of the site only if they're authenticated. On the other hand, `isNotAuth` will automatically redirect an authenticated user to the user page when they try to login.
+This makes it so that we can login, and the web application will remember who we are. However, when we visit the login page, it doesn't automatically redirect us the user page. Even worse, we can access the user pages without actually being logged in if we manually type in the URL. To fix this, we need to create a middleware that will check if a user is authenticated or not and redirect them accordingly. In `mw/auth.js` we export two seperate functions to deal with the two problems. `isAuth` will allow the user to access portions of the site only if they're authenticated. On the other hand, `isNotAuth` will automatically redirect an authenticated user to the user page when they try to login.
 
 ```javascript
 const authMw = {
@@ -810,7 +809,7 @@ router.get('/',
 
 ### bcrypt
 
-When storing user passwords or password hints inside a database, we should **NEVER** store them as plaintext. This makes data breaches very dangerous because all user accounts will be instantly compromised. We can use bcrypt to hash user passwords before storing them inside our database. Additionally, we can include the use of salt to make our hashes even more unpredictable. We can see this in action inside `postRegister` of `ctrl/index.js`.
+When storing user passwords or password hints inside a database, we should **NEVER** store them as plaintext. This makes data breaches very dangerous because all user accounts will be instantly compromised. We can use a node module called **bcrypt** to hash user passwords before storing them inside our database. Additionally, we can include the use _salt_ to make our hashes even more unpredictable. We can see this in action inside `postRegister` of `ctrl/index.js`.
 
 ```javascript
 const salt = await bcrypt.genSalt(8);
